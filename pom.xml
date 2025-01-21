@@ -71,11 +71,14 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-			<groupId>telran.probes</groupId>
-            <artifactId>probes-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+			         <groupId>telran.probes</groupId>
+                     <artifactId>probes-api</artifactId>
+                     <version>0.0.1-SNAPSHOT</version>
            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
+	<modules>
+		<module>analyzer</module>
+	</modules>
 </project>
