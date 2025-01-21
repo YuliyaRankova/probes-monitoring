@@ -2,13 +2,16 @@ package telran.probes;
 
 import java.util.function.Consumer;
 
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import telran.probes.service.RangeProviderClient;
 
 @SpringBootApplication
 @RequiredArgsConstructor
@@ -18,21 +21,34 @@ public class AnalyzerAppl {
 	@Value("${app.analyzer.producer.binding.name}")
 	String producerBindingName;
 	
+	final RangeProviderClient service;
+	final StreamBridge bridge;
+
+	public static void main(String[] args) {
+		SpringApplication.run(AnalyzerAppl.class, args);
+	}
+
 	@Bean
 	Consumer<ProbeData> analyzerConsumer(){
 		return probeData ->{
 			log.trace("received probe: {}", probeData);
-			//TODO
-			log.debug("deviation: {}");
-			//TODO
-			log.debug("deviation data {} send to {}");
+			long sensorId = probeData.id();
+			Range range = service.getRange(sensorId);
+			double value = probeData.value();
+			double deviation = 0;
+			if(value < range.min())
+				deviation = value - range.min();
+			else if(value < range.max())
+				deviation = value - range.max();
+			if(deviation != 0) {
+				log.debug("deviation: {}", deviation);
+				DeviationData dataDeviation = new DeviationData(sensorId, deviation, value, System.currentTimeMillis());
+				bridge.send(producerBindingName, dataDeviation);
+				log.debug("deviation data {} sent to {}", dataDeviation, producerBindingName);
+			} else {
+				log.debug("Deviation not detected");
+			}
 		};
 	}
 	
-
-	public static void main(String[] args) {
-		SpringApplication.run(AnalyzerAppl.class, args);
-
-	}
-
 }

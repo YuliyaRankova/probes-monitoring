@@ -32,6 +32,7 @@ class AnalyzerControllerTest {
 	@Autowired
 	OutputDestination consumer;
 	
+	@Autowired
 	ObjectMapper mapper;
 	
 	@Value("${app.analyzer.consumer.binding.name:analyzerConsumer-in-0}")
@@ -74,7 +75,7 @@ class AnalyzerControllerTest {
 		
 		assertEquals(SENSOR_ID, deviation.id());
 		assertEquals(DEVIATION_GREATER_MAX, deviation.deviation());
-		assertEquals(MAX_VALUE, deviation.value());
+		assertEquals(VALUE_GREATER_MAX, deviation.value());
 	}
 	
 	@Test
@@ -86,7 +87,7 @@ class AnalyzerControllerTest {
 		
 		assertEquals(SENSOR_ID, deviation.id());
 		assertEquals(DEVIATION_LESS_MIN, deviation.deviation());
-		assertEquals(MIN_VALUE, deviation.value());
+		assertEquals(VALUE_LESS_MIN, deviation.value());
 	}
 
 	@Test
